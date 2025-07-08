@@ -9,7 +9,7 @@ typedef struct
     double Z; //The raw value of the Neuron
     double val; //The value of the Neuron
 }Neuron;
-void inputWeightsSize(Neuron* neuron, unsigned long long int n); //Input the size of weights to have so we can Malloc the right size
+void calNeuronWeightsSize(Neuron* neuron, unsigned long long int n); //Input the size of weights to have so we can Malloc the right size
 double sigmoid(double x);
 void activate(Neuron* neuron);
 void freeNeuron(Neuron* neuron); // Free allocated mem

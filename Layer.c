@@ -38,7 +38,7 @@ void setUpNeuronsParam(Layer* layer)
 {
     for (size_t i = 0; i < layer->numNeurons; i++)
     {
-        inputWeightsSize(&layer->neurons[i], layer->next->numNeurons);
+        calNeuronWeightsSize(&layer->neurons[i], layer->next->numNeurons);
     }
 }
 

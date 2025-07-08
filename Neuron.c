@@ -3,7 +3,7 @@
 #include<stdlib.h>
 #include<assert.h>
 #include<math.h>
-void inputWeightsSize(Neuron* neuron, unsigned long long int n)
+void calNeuronWeightsSize(Neuron* neuron, unsigned long long int n)
 {
     assert(neuron != NULL && "NEURON CANNOT BE NULL!"); //Cannot be NULL at all!
     if (neuron->weights != NULL) {free(neuron->weights); neuron->weights = NULL;} //Free if not null
@@ -19,13 +19,16 @@ void inputWeightsSize(Neuron* neuron, unsigned long long int n)
     printf("Allocated Weights Successfully!");
     
 }
-double sigmoid(double x) {
-    return 1.0 / (1.0 + exp(-x));
+double ELUactivation(double x) {
+    if (x > 0) {
+        return x;
+    } else {
+        return 1.0 * (exp(x) - 1.0);
+    }
 }
-
 void activate(Neuron* neuron)
 {
-    neuron->val = sigmoid(neuron->Z+neuron->bias);
+    neuron->val = ELUactivation(neuron->Z+neuron->bias);
 }
 void freeNeuron(Neuron* neuron) {
     if (neuron == NULL) {
