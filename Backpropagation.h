@@ -2,6 +2,6 @@
 #define H_BACKPROP
 #include"NeuralNetwork.h"
 
-double OmniWeightContribute(NeuralNetwork* network, unsigned long long int indexLayer, unsigned long long int path);
+double followWeightPath(NeuralNetwork* network, unsigned long long int targetLayer, unsigned long long int targetNeuron, unsigned long long targetWeight);
 double sigmoidDerivative(double Z);
 #endif

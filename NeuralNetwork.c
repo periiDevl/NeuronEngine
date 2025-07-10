@@ -34,7 +34,13 @@ void forwardPass(NeuralNetwork* network)
 {
     for (size_t i = 0; i < network->numLayers - 1; i++)
     {
-        connectToLayer(&network->layers[i], &network->layers[i+1]);
+        if (i==0)
+        {
+            connectToFirstLayer(&network->layers[i], &network->layers[i+1]);
+        }
+        else{
+            connectToLayer(&network->layers[i], &network->layers[i+1]);
+        }
     }
     
 }

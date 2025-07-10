@@ -2,6 +2,7 @@
 void setNeuronsSize(Layer* layer, unsigned long long int n)
 {
     assert(layer != NULL && "LAYER CANNOT BE NULL!"); //Cannot be NULL at all!
+    assert(n > 0 && "YOU CANNOT INPUT 0 NEURONS!");
     if (layer->neurons != NULL) {free(layer->neurons); layer->neurons = NULL;} //Free if not null
     layer->numNeurons = 0;
     layer->neurons = (Neuron*)malloc(n*sizeof(Neuron)); //Allocate size
@@ -17,9 +18,11 @@ void setNeuronsSize(Layer* layer, unsigned long long int n)
 }
 
 
-void connectNeuronToLayer(Neuron* neuron, Layer* layer)
+void connectNeuronToLayer(Neuron* neuron, Layer* layer, int activ)
 {
-    activate(neuron);
+    if (activ>0){
+        activate(neuron);
+    }
     for (size_t i = 0; i < layer->numNeurons; i++)
     {
         layer->neurons[i].Z += neuron->val*neuron->weights[i];
@@ -30,7 +33,15 @@ void connectToLayer(Layer* l1,Layer* l2)
 {
     for (size_t i = 0; i < l1->numNeurons; i++)
     {
-        connectNeuronToLayer(&l1->neurons[i],l2);
+        connectNeuronToLayer(&l1->neurons[i],l2, 1);
+    }
+    
+}
+void connectToFirstLayer(Layer* l1,Layer* l2)
+{
+    for (size_t i = 0; i < l1->numNeurons; i++)
+    {
+        connectNeuronToLayer(&l1->neurons[i],l2, -1);
     }
     
 }

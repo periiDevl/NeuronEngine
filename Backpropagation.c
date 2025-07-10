@@ -14,20 +14,34 @@ double ELUderivative(double x) {
         // return (y + ELU_ALPHA); // for x <= 0
     }
 }
-double OmniWeightContribute(NeuralNetwork* network, unsigned long long int indexLayer, unsigned long long int path)
+double followPathNeuron(NeuralNetwork* network, unsigned long long int targetLayer, unsigned long long int targetNeuron, unsigned long long int currNeuron, unsigned long long int currLayer, double val)
 {
-    double contribute = 1;
-    for (size_t i = network->numLayers-1; i > indexLayer; i--)
+    if (currLayer == network->numLayers - 1)
     {
-        if (i != network->numLayers - 1){
-            contribute = contribute * network->layers[i].neurons[path].weights[0];
-        }
-        contribute = contribute * ELUderivative(network->layers[i].neurons[path].Z);
+        return val;
     }
     
-    contribute = contribute * network->layers[indexLayer].neurons[path].val;
-    contribute = contribute * ELUderivative(network->layers[indexLayer].neurons[path].Z);
+    double totalContribution = 0.0;
     
-    return contribute;
+    for (size_t nextNeuron = 0; nextNeuron < network->layers[currLayer + 1].numNeurons; nextNeuron++)
+    {
+        double weight = network->layers[currLayer].neurons[currNeuron].weights[nextNeuron];
+        double derivative = ELUderivative(network->layers[currLayer + 1].neurons[nextNeuron].Z);
+        totalContribution += followPathNeuron(network, targetLayer, targetNeuron, nextNeuron, currLayer + 1, val * weight * derivative);
+    }
     
+    return totalContribution;
+}
+
+double followWeightPath(NeuralNetwork* network, unsigned long long int targetLayer, unsigned long long int targetNeuron, unsigned long long targetWeight)
+{
+    if (targetLayer == 0)
+    {
+        return 0.0;
+    }
+    
+    double input_activation = network->layers[targetLayer - 1].neurons[targetWeight].val;
+    double activation_derivative = ELUderivative(network->layers[targetLayer].neurons[targetNeuron].Z);
+    double gradient_to_output = followPathNeuron(network, targetLayer, targetNeuron, targetNeuron, targetLayer, 1.0);
+    return input_activation * activation_derivative * gradient_to_output;
 }
