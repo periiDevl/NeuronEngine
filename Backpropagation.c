@@ -33,15 +33,27 @@ double followPathNeuron(NeuralNetwork* network, unsigned long long int targetLay
     return totalContribution;
 }
 
-double followWeightPath(NeuralNetwork* network, unsigned long long int targetLayer, unsigned long long int targetNeuron, unsigned long long targetWeight)
-{
-    if (targetLayer == 0)
-    {
-        return 0.0;
+double followWeightPath(NeuralNetwork* network, unsigned long long int targetLayer, 
+                       unsigned long long int targetNeuron, unsigned long long targetWeight) {
+    if (targetLayer == 0) {
+        return 0.0;  // Input layer has no weights to update
     }
     
     double input_activation = network->layers[targetLayer - 1].neurons[targetWeight].val;
     double activation_derivative = ELUderivative(network->layers[targetLayer].neurons[targetNeuron].Z);
-    double gradient_to_output = followPathNeuron(network, targetLayer, targetNeuron, targetNeuron, targetLayer, 1.0);
-    return input_activation * activation_derivative * gradient_to_output;
+    
+    // For output layer, the gradient is just the error * activation_derivative
+    if (targetLayer == network->numLayers - 1) {
+        return input_activation * activation_derivative;
+    }
+    
+    // For hidden layers, we need to accumulate contributions from all downstream paths
+    double downstream_gradient = 0.0;
+    for (size_t nextNeuron = 0; nextNeuron < network->layers[targetLayer + 1].numNeurons; nextNeuron++) {
+        double weight = network->layers[targetLayer].neurons[targetNeuron].weights[nextNeuron];
+        double next_derivative = ELUderivative(network->layers[targetLayer + 1].neurons[nextNeuron].Z);
+        downstream_gradient += followPathNeuron(network, targetLayer, targetNeuron, nextNeuron, targetLayer + 1, weight * next_derivative);
+    }
+    
+    return input_activation * activation_derivative * downstream_gradient;
 }
