@@ -1,4 +1,11 @@
 #include"NeuralNetwork.h"
+void resetNeuralNetwork(NeuralNetwork* network){
+    for (size_t i = 0; i < network->numLayers; i++)
+    {
+        resetLayer(&network->layers[i]);
+    }
+    
+}
 void createNeuralNetwork(NeuralNetwork* network, unsigned long long int n)
 {
     assert(network != NULL && "NETWORK CANNOT BE NULL!"); //Cannot be NULL at all!

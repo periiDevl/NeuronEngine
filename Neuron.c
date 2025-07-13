@@ -3,6 +3,19 @@
 #include<stdlib.h>
 #include<assert.h>
 #include<math.h>
+void resetNeuron(Neuron* neuron)
+{
+    neuron->bias = 0;
+    neuron->val = 0;
+    neuron->Z = 0;
+    /*
+    for (size_t i = 0; i < neuron->weightsSize; i++)
+    {
+        neuron->weights[i] = 0;
+    }
+        */
+    
+}
 void calNeuronWeightsSize(Neuron* neuron, unsigned long long int n)
 {
     assert(neuron != NULL && "NEURON CANNOT BE NULL!"); //Cannot be NULL at all!
@@ -16,7 +29,6 @@ void calNeuronWeightsSize(Neuron* neuron, unsigned long long int n)
         return;
     }
     neuron->weightsSize = n;
-    printf("Allocated Weights Successfully!");
     
 }
 double ELUactivation(double x) {
@@ -26,9 +38,12 @@ double ELUactivation(double x) {
         return 1.0 * (exp(x) - 1.0);
     }
 }
+double sigmoid(double x) {
+    return 1.0 / (1.0 + exp(-x));
+}
 void activate(Neuron* neuron)
 {
-    neuron->val = ELUactivation(neuron->Z+neuron->bias);
+    neuron->val = sigmoid(neuron->Z+neuron->bias);
 }
 void freeNeuron(Neuron* neuron) {
     if (neuron == NULL) {
@@ -39,9 +54,6 @@ void freeNeuron(Neuron* neuron) {
     if (neuron->weights != NULL) {
         free(neuron->weights);      
         neuron->weights = NULL;     
-        printf("Freed weights array for neuron.\n");
-    } else {
-        printf("Weights array for neuron was already NULL or not allocated. No free needed.\n");
     }
 
 }

@@ -12,6 +12,7 @@ typedef struct Layer
     unsigned long long int numNeurons; // Size of Neurons array
     Layer* next;
 }Layer;
+void resetLayer(Layer* layer);
 void setNeuronsSize(Layer* layer, unsigned long long int n);
 void connectToFirstLayer(Layer* l1,Layer* l2);
 void connectNeuronToLayer(Neuron* neuron, Layer* layer, int activ);

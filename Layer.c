@@ -1,4 +1,12 @@
 #include"Layer.h"
+void resetLayer(Layer* layer)
+{
+    for (size_t i = 0; i < layer->numNeurons; i++)
+    {
+        resetNeuron(&layer->neurons[i]);
+    }
+    
+}
 void setNeuronsSize(Layer* layer, unsigned long long int n)
 {
     assert(layer != NULL && "LAYER CANNOT BE NULL!"); //Cannot be NULL at all!
@@ -13,7 +21,6 @@ void setNeuronsSize(Layer* layer, unsigned long long int n)
         return;
     }
     layer->numNeurons = n;
-    printf("Allocated Neurons Successfully!");
     
 }
 
