@@ -51,7 +51,7 @@ int main() {
 
     TerminalGraph terminalGraph;
     createTerminalGraph(&terminalGraph, 40);
-    for (size_t epoch = 0; epoch < 100; epoch++)
+    for (size_t epoch = 0; epoch < 1; epoch++)
     {
     
         network.layers[0].neurons[0].weights[0] = randomDouble(-max, max);

@@ -12,4 +12,5 @@ typedef struct TerminalGraph
 void createTerminalGraph(TerminalGraph* termGraph,int size);
 void drawTerminalGraph(TerminalGraph* termGraph);
 void destroyTerminalGraph(TerminalGraph* termGraph);
+void calculateCostTerminalGraph(TerminalGraph* termGraph);
 #endif
