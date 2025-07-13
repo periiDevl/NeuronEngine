@@ -4,8 +4,10 @@
 typedef struct
 {
     double* weights; //Pointer to the weights array
+    double* weightsGradients; //Pointer to the weights derivative array
     unsigned long long int weightsSize; //Size for the array of weights
     double bias; // Pointer to the Biases array
+    double biasGradient;
     double Z; //The raw value of the Neuron
     double val; //The value of the Neuron
 }Neuron;

@@ -8,20 +8,22 @@ void resetNeuron(Neuron* neuron)
     neuron->bias = 0;
     neuron->val = 0;
     neuron->Z = 0;
-    /*
+    
     for (size_t i = 0; i < neuron->weightsSize; i++)
     {
-        neuron->weights[i] = 0;
+        neuron->weightsGradients[i] = 0;
     }
-        */
+        
     
 }
 void calNeuronWeightsSize(Neuron* neuron, unsigned long long int n)
 {
     assert(neuron != NULL && "NEURON CANNOT BE NULL!"); //Cannot be NULL at all!
     if (neuron->weights != NULL) {free(neuron->weights); neuron->weights = NULL;} //Free if not null
+    if (neuron->weightsGradients != NULL) {free(neuron->weightsGradients); neuron->weightsGradients = NULL;}
     neuron->weightsSize = 0;
     neuron->weights = (double*)malloc(n*sizeof(double)); //Allocate size
+    neuron->weightsGradients = (double*)malloc(n*sizeof(double)); //Allocate size
 
     if (neuron->weights == NULL) {
         printf("Error: Allocation FAILED for neuron weights.\n");

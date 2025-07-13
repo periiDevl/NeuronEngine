@@ -47,7 +47,9 @@ int main() {
     forwardPass(&network);
     activate(&network.layers[2].neurons[0]);
     printf("N1 = %f", network.layers[2].neurons[0].val);
-    printf("w1 gradient contribution = %f\n", followWeightPath(&network,1,0,0));
+    computeAllNetworkGradients(&network);
+    //printf("w1 gradient contribution = %f\n", followWeightPath(&network,1,0,0));
+    printf("w1 gradient contribution 2 = %f\n", network.layers[0].neurons[0].weightsGradients[0]);
 
     TerminalGraph terminalGraph;
     createTerminalGraph(&terminalGraph, 40);

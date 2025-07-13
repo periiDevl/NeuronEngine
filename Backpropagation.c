@@ -1,16 +1,9 @@
 #include"Backpropagation.h"
-enum NextCalculationType{
-    DERIV_WEIGHT, //How much is a weight affecting the 
-    DERIV_NEURON, //How much a neuron is affecting the Z of another neuron
-    DERIV_ACTIVATION, //How much is a value affecting the activation func
-    DERIV_BIAS
-};
 double ELUderivative(double x) {
     if (x > 0) {
         return 1.0;
     } else {
         return 1.0 * exp(x);
-        // Alternatively, if you have the activated output 'y = elu_activation(x)':
         // return (y + ELU_ALPHA); // for x <= 0
     }
 }
@@ -18,69 +11,53 @@ double sigmoidDerivative(double x) {
     double s = sigmoid(x); // Calculate sigmoid(x) once to avoid redundant computation
     return s * (1.0 - s);
 }
-double followPathNeuron(NeuralNetwork* network, unsigned long long int targetLayer, unsigned long long int targetNeuron, unsigned long long int currNeuron, unsigned long long int currLayer, double val)
-{
-    if (currLayer == network->numLayers - 1)
-    {
-        return val;
+
+void computeAllNetworkGradients(NeuralNetwork* network) {
+    double** deltas = (double**)malloc(network->numLayers * sizeof(double*));
+    for (size_t layer = 0; layer < network->numLayers; layer++) {
+        deltas[layer] = (double*)calloc(network->layers[layer].numNeurons, sizeof(double));
     }
     
-    double totalContribution = 0.0;
-    
-    for (size_t nextNeuron = 0; nextNeuron < network->layers[currLayer + 1].numNeurons; nextNeuron++)
-    {
-        double weight = network->layers[currLayer].neurons[currNeuron].weights[nextNeuron];
-        double derivative = ELUderivative(network->layers[currLayer + 1].neurons[nextNeuron].Z);
-        totalContribution += followPathNeuron(network, targetLayer, targetNeuron, nextNeuron, currLayer + 1, val * weight * derivative);
+    size_t outputLayer = network->numLayers - 1;
+    for (size_t neuron = 0; neuron < network->layers[outputLayer].numNeurons; neuron++) {
+        double z = network->layers[outputLayer].neurons[neuron].Z;
+        deltas[outputLayer][neuron] = ELUderivative(z) * 1.0; // Replace 1.0 with actual loss derivative
     }
     
-    return totalContribution;
+    for (int layer = network->numLayers - 2; layer >= 0; layer--) {
+        for (size_t neuron = 0; neuron < network->layers[layer].numNeurons; neuron++) {
+            double sum = 0.0;
+            
+            for (size_t nextNeuron = 0; nextNeuron < network->layers[layer + 1].numNeurons; nextNeuron++) {
+                double weight = network->layers[layer].neurons[neuron].weights[nextNeuron];
+                sum += deltas[layer + 1][nextNeuron] * weight;
+            }
+            
+            double z = network->layers[layer].neurons[neuron].Z;
+            deltas[layer][neuron] = sum * ELUderivative(z);
+        }
+    }
+    
+    for (size_t layer = 0; layer < network->numLayers - 1; layer++) {
+        for (size_t neuron = 0; neuron < network->layers[layer].numNeurons; neuron++) {
+            for (size_t nextNeuron = 0; nextNeuron < network->layers[layer + 1].numNeurons; nextNeuron++) {
+                double input_activation = network->layers[layer].neurons[neuron].val;
+                double gradient = input_activation * deltas[layer + 1][nextNeuron];
+                
+                network->layers[layer].neurons[neuron].weightsGradients[nextNeuron] = gradient;
+            }
+        }
+    }
+    
+    for (size_t layer = 1; layer < network->numLayers; layer++) {
+        for (size_t neuron = 0; neuron < network->layers[layer].numNeurons; neuron++) {
+            network->layers[layer].neurons[neuron].biasGradient = deltas[layer][neuron];
+        }
+    }
+    
+    for (size_t layer = 0; layer < network->numLayers; layer++) {
+        free(deltas[layer]);
+    }
+    free(deltas);
 }
 
-double followWeightPath(NeuralNetwork* network, unsigned long long int targetLayer, 
-                       unsigned long long int targetNeuron, unsigned long long targetWeight) {
-    if (targetLayer == 0) {
-        return 0;  // Input layer has no weights to update
-    }
-    
-    double input_activation = network->layers[targetLayer - 1].neurons[targetWeight].val;
-    double activation_derivative = ELUderivative(network->layers[targetLayer].neurons[targetNeuron].Z);
-    
-    // For output layer, the gradient is just the error * activation_derivative
-    if (targetLayer == network->numLayers - 1) {
-        return input_activation * activation_derivative;
-    }
-    
-    // For hidden layers, we need to accumulate contributions from all downstream paths
-    double downstream_gradient = 0.0;
-    for (size_t nextNeuron = 0; nextNeuron < network->layers[targetLayer + 1].numNeurons; nextNeuron++) {
-        double weight = network->layers[targetLayer].neurons[targetNeuron].weights[nextNeuron];
-        double next_derivative = ELUderivative(network->layers[targetLayer + 1].neurons[nextNeuron].Z);
-        downstream_gradient += followPathNeuron(network, targetLayer, targetNeuron, nextNeuron, targetLayer + 1, weight * next_derivative);
-    }
-    
-    return input_activation * activation_derivative * downstream_gradient;
-}
-double followBiasPath(NeuralNetwork* network, unsigned long long int targetLayer, 
-                      unsigned long long int targetNeuron) {
-    if (targetLayer == 0) {
-        return 0.0; // Input layer has no biases to update
-    }
-    
-    double activation_derivative = ELUderivative(network->layers[targetLayer].neurons[targetNeuron].Z);
-    
-    // For output layer, the gradient is just the activation derivative
-    if (targetLayer == network->numLayers - 1) {
-        return activation_derivative;
-    }
-    
-    // For hidden layers, we need to accumulate contributions from all downstream paths
-    double downstream_gradient = 0.0;
-    for (size_t nextNeuron = 0; nextNeuron < network->layers[targetLayer + 1].numNeurons; nextNeuron++) {
-        double weight = network->layers[targetLayer].neurons[targetNeuron].weights[nextNeuron];
-        double next_derivative = ELUderivative(network->layers[targetLayer + 1].neurons[nextNeuron].Z);
-        downstream_gradient += followPathNeuron(network, targetLayer, targetNeuron, nextNeuron, targetLayer + 1, weight * next_derivative);
-    }
-    
-    return activation_derivative * downstream_gradient;
-}
