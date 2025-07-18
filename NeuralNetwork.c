@@ -39,18 +39,31 @@ void setLayersParam(NeuralNetwork* network)
 }
 void forwardPass(NeuralNetwork* network)
 {
-    for (size_t i = 0; i < network->numLayers - 1; i++)
-    {
-        if (i==0)
-        {
-            connectToFirstLayer(&network->layers[i], &network->layers[i+1]);
-        }
-        else{
-            connectToLayer(&network->layers[i], &network->layers[i+1]);
+    //Reset Z values for all neurons except input layer
+    for (size_t layer = 1; layer < network->numLayers; layer++) {
+        for (size_t neuron = 0; neuron < network->layers[layer].numNeurons; neuron++) {
+            network->layers[layer].neurons[neuron].Z = 0.0;
         }
     }
     
+    for (size_t layer = 0; layer < network->numLayers - 1; layer++) {
+        for (size_t neuron = 0; neuron < network->layers[layer].numNeurons; neuron++) {
+            double activation = network->layers[layer].neurons[neuron].val;
+            
+            for (size_t nextNeuron = 0; nextNeuron < network->layers[layer + 1].numNeurons; nextNeuron++) {
+                double weight = network->layers[layer].neurons[neuron].weights[nextNeuron];
+                network->layers[layer + 1].neurons[nextNeuron].Z += activation * weight;
+            }
+        }
+        if (layer + 1 > 0) {
+            for (size_t neuron = 0; neuron < network->layers[layer + 1].numNeurons; neuron++) {
+                network->layers[layer + 1].neurons[neuron].Z += network->layers[layer + 1].neurons[neuron].bias;
+                activate(&network->layers[layer + 1].neurons[neuron]);
+            }
+        }
+    }
 }
+
 void freeNetwork(NeuralNetwork* network)
 {
     if (network == NULL) {

@@ -5,16 +5,11 @@
 #include<math.h>
 void resetNeuron(Neuron* neuron)
 {
-    neuron->bias = 0;
-    neuron->val = 0;
-    neuron->Z = 0;
-    
+    neuron->Z = 0.0; 
     for (size_t i = 0; i < neuron->weightsSize; i++)
     {
-        neuron->weightsGradients[i] = 0;
+        neuron->weightsGradients[i] = 0.0;
     }
-        
-    
 }
 void calNeuronWeightsSize(Neuron* neuron, unsigned long long int n)
 {

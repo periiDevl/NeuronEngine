@@ -25,33 +25,7 @@ void setNeuronsSize(Layer* layer, unsigned long long int n)
 }
 
 
-void connectNeuronToLayer(Neuron* neuron, Layer* layer, int activ)
-{
-    if (activ>0){
-        activate(neuron);
-    }
-    for (size_t i = 0; i < layer->numNeurons; i++)
-    {
-        layer->neurons[i].Z += neuron->val*neuron->weights[i];
-    }
-    
-}
-void connectToLayer(Layer* l1,Layer* l2)
-{
-    for (size_t i = 0; i < l1->numNeurons; i++)
-    {
-        connectNeuronToLayer(&l1->neurons[i],l2, 1);
-    }
-    
-}
-void connectToFirstLayer(Layer* l1,Layer* l2)
-{
-    for (size_t i = 0; i < l1->numNeurons; i++)
-    {
-        connectNeuronToLayer(&l1->neurons[i],l2, -1);
-    }
-    
-}
+
 void setUpNeuronsParam(Layer* layer)
 {
     for (size_t i = 0; i < layer->numNeurons; i++)

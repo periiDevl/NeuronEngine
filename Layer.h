@@ -13,10 +13,7 @@ typedef struct Layer
     Layer* next;
 }Layer;
 void resetLayer(Layer* layer);
-void setNeuronsSize(Layer* layer, unsigned long long int n);
-void connectToFirstLayer(Layer* l1,Layer* l2);
-void connectNeuronToLayer(Neuron* neuron, Layer* layer, int activ);
-void connectToLayer(Layer* l1,Layer* l2);
+void setNeuronsSize(Layer* layer, unsigned long long int n);;
 void setUpNeuronsParam(Layer* layer);
 void freeLayer(Layer* Layer); // Free allocated mem
 #endif
