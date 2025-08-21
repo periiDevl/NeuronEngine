@@ -40,7 +40,7 @@ double sigmoid(double x) {
 }
 void activate(Neuron* neuron)
 {
-    neuron->val = ELUactivation(neuron->Z+neuron->bias);
+    neuron->val = sigmoid(neuron->Z+neuron->bias);
 }
 void freeNeuron(Neuron* neuron) {
     if (neuron == NULL) {

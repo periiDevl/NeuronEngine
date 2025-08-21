@@ -39,7 +39,7 @@ int main() {
     network.layers[0].neurons[0].bias = 0.0;
     network.layers[0].neurons[1].bias = 0.0;
     
-    double inputs[2] = {500, 300};
+    double inputs[2] = {5000, -3000};
     double expected[1] = {0.8777};
     
     for (size_t i = 0; i < 2000; i++) {

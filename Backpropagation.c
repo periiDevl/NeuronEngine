@@ -43,7 +43,7 @@ void computeAllNetworkGradients(NeuralNetwork* network, double* expectedOutputs)
         double expected = expectedOutputs[neuron];
         
         double costDeriv = getIndvCostDeriv(expected, output);
-        double activationDeriv = ELUderivative(z);
+        double activationDeriv = sigmoidDerivative(z);
         deltas[outputLayer][neuron] = costDeriv * activationDeriv;
     }
     
@@ -55,7 +55,7 @@ void computeAllNetworkGradients(NeuralNetwork* network, double* expectedOutputs)
                 sum += deltas[layer + 1][nextNeuron] * weight;
             }
             double z = network->layers[layer].neurons[neuron].Z;
-            deltas[layer][neuron] = sum * ELUderivative(z);
+            deltas[layer][neuron] = sum * sigmoidDerivative(z);
         }
     }
     for (size_t layer = 0; layer < network->numLayers - 1; layer++) {
