@@ -37,28 +37,13 @@ void setLayersParam(NeuralNetwork* network)
         setUpNeuronsParam(&network->layers[i]);
     }
 }
-void forwardPass(NeuralNetwork* network)
-{
-    for (size_t layer = 1; layer < network->numLayers; layer++) {
-        for (size_t neuron = 0; neuron < network->layers[layer].numNeurons; neuron++) {
-            network->layers[layer].neurons[neuron].Z = 0.0;
-        }
-    }
-    for (size_t layer = 0; layer < network->numLayers - 1; layer++) {
-        for (size_t neuron = 0; neuron < network->layers[layer].numNeurons; neuron++) {
-            double activation = network->layers[layer].neurons[neuron].val;
-
-            for (size_t nextNeuron = 0; nextNeuron < network->layers[layer + 1].numNeurons; nextNeuron++) {
-                double weight = network->layers[layer].neurons[neuron].weights[nextNeuron];
-                network->layers[layer + 1].neurons[nextNeuron].Z += activation * weight;
-            }
-        }
-        for (size_t neuron = 0; neuron < network->layers[layer + 1].numNeurons; neuron++) {
-            activate(&network->layers[layer + 1].neurons[neuron]);
-        }
+void forwardPass(NeuralNetwork* network) {
+    Layer* layer = &network->layers[0];
+    while (layer != NULL && layer->next != NULL) {
+        layerForward(layer);
+        layer = layer->next;
     }
 }
-
 
 void freeNetwork(NeuralNetwork* network)
 {

@@ -16,4 +16,5 @@ void resetLayer(Layer* layer);
 void setNeuronsSize(Layer* layer, unsigned long long int n);;
 void setUpNeuronsParam(Layer* layer);
 void freeLayer(Layer* Layer); // Free allocated mem
+void layerForward(Layer* layer);
 #endif

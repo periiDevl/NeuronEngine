@@ -49,3 +49,25 @@ void freeLayer(Layer* layer){
         layer->neurons = NULL;     
     } 
 }
+
+void layerForward(Layer* layer)
+{
+    if (layer == NULL || layer->next == NULL) {return;}
+    //Reset
+    for (size_t i = 0;i < layer->next->numNeurons; i++)
+    {
+        layer->next->neurons[i].Z = 0;
+    }
+    for (size_t i = 0;i < layer->numNeurons; i++)
+    {
+        double v = layer->neurons[i].val;
+        for (size_t j = 0;j < layer->next->numNeurons; j++)
+        {
+            layer->next->neurons[j].Z += v * layer->neurons[i].weights[j];
+        }
+    }
+    for (size_t i = 0;i < layer->next->numNeurons; i++)
+    {
+        activate(&layer->next->neurons[i]);
+    }
+}
