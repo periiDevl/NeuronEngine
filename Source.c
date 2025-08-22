@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-
 double randomDouble(double min, double max) {
     return ((double)rand() / RAND_MAX) * (max - min) + min;
 }
@@ -23,7 +22,7 @@ int main() {
     
     setLayersParam(&network);
     
-    double max = 3.0; 
+    double max = 1.0; 
     
     network.layers[0].neurons[0].weights[0] = randomDouble(-max, max);
     network.layers[0].neurons[0].weights[1] = randomDouble(-max, max);

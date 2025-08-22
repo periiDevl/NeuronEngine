@@ -1,0 +1,88 @@
+sudo apt install libgtk-3-dev
+#include"UI/UI.h"
+
+
+typedef struct {
+    double x, y;
+    double radius;
+    gboolean dragging;
+    double offset_x, offset_y;
+} Circle;
+
+Circle circle = {150, 100, 50, FALSE, 0, 0};
+
+// Draw callback
+static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data) {
+    cairo_set_source_rgb(cr, 0.2, 0.6, 0.8);
+    cairo_arc(cr, circle.x, circle.y, circle.radius, 0, 2 * G_PI);
+    cairo_fill(cr);
+    return FALSE;
+}
+
+// Mouse press
+static gboolean on_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
+    double dx = event->x - circle.x;
+    double dy = event->y - circle.y;
+    if (dx*dx + dy*dy <= circle.radius * circle.radius) {
+        circle.dragging = TRUE;
+        circle.offset_x = dx;
+        circle.offset_y = dy;
+    }
+    return TRUE;
+}
+
+// Mouse release
+static gboolean on_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
+    circle.dragging = FALSE;
+    return TRUE;
+}
+
+// Mouse motion
+static gboolean on_motion_notify(GtkWidget *widget, GdkEventMotion *event, gpointer user_data) {
+    if (circle.dragging) {
+        circle.x = event->x - circle.offset_x;
+        circle.y = event->y - circle.offset_y;
+        gtk_widget_queue_draw(widget);
+    }
+    return TRUE;
+}
+
+// Button click callback
+static void on_button_clicked(GtkWidget *widget, gpointer data) {
+    g_print("Button clicked!\n");
+}
+
+int main(int argc, char* argv[]) {
+    gtk_init(&argc, &argv);
+
+    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window), "Neuron Engine - Jonathan Peri");
+    gtk_window_set_default_size(GTK_WINDOW(window), 1200, 700);
+
+    GtkWidget *fixed = gtk_fixed_new();
+    gtk_container_add(GTK_CONTAINER(window), fixed);
+
+    // Drawing area
+    GtkWidget *drawing_area = gtk_drawing_area_new();
+    gtk_widget_set_size_request(drawing_area, 1200, 700);
+    gtk_fixed_put(GTK_FIXED(fixed), drawing_area, 0, 0);
+
+    g_signal_connect(drawing_area, "draw", G_CALLBACK(on_draw), NULL);
+    g_signal_connect(drawing_area, "button-press-event", G_CALLBACK(on_button_press), NULL);
+    g_signal_connect(drawing_area, "button-release-event", G_CALLBACK(on_button_release), NULL);
+    g_signal_connect(drawing_area, "motion-notify-event", G_CALLBACK(on_motion_notify), NULL);
+
+    gtk_widget_set_events(drawing_area, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
+
+    // Button
+    GtkWidget *button = gtk_button_new_with_label("Click Me");
+    gtk_fixed_put(GTK_FIXED(fixed), button, 50, 220);
+    gtk_widget_set_size_request(button, 100, 50);
+    g_signal_connect(button, "clicked", G_CALLBACK(on_button_clicked), NULL);
+
+    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    gtk_widget_show_all(window);
+
+    gtk_main();
+    return 0;
+}
